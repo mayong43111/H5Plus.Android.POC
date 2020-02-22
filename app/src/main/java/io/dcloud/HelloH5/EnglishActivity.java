@@ -1,5 +1,6 @@
 package io.dcloud.HelloH5;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
 import android.graphics.Bitmap;
@@ -112,7 +113,7 @@ public class EnglishActivity extends AppCompatActivity {
     @AfterPermissionGranted(RC_RECORD_AUDIO)
     private Boolean startAudioRecording() {
 
-        String[] perms = {android.Manifest.permission.RECORD_AUDIO};
+        String[] perms = {android.Manifest.permission.RECORD_AUDIO, Manifest.permission.ACCESS_FINE_LOCATION};
         if (EasyPermissions.hasPermissions(this, perms)) {
             AudioRecorder.getInstance().startRecord();
             return true;
