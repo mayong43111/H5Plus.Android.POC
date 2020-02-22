@@ -40,14 +40,20 @@ public class AudioRecorder {
         }
         //将录音状态设置成正在录音状态
         status = Status.STATUS_START;
-        mRecorder.start();
+        try {
+            mRecorder.prepare();
+            mRecorder.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String stopRecord() {
 
-        if (status == Status.STATUS_START) {
-            mRecorder.stop();
+        if (status == Status.STATUS_START && mRecorder != null) {
             status = Status.STATUS_STOP;
+
+            mRecorder.stop();
             return release();
         }
 
@@ -59,13 +65,12 @@ public class AudioRecorder {
 
         if (mRecorder != null) {
             mRecorder.release();
-            mRecorder = null;
         }
 
-        byte[] audiodata = DHFile.readAll(fileFullPath);
+        byte[] audioData = DHFile.readAll(fileFullPath);
         DHFile.delete(fileFullPath);
 
-        return android.util.Base64.encodeToString(audiodata, Base64.NO_WRAP);
+        return android.util.Base64.encodeToString(audioData, Base64.NO_WRAP);
     }
 
     private MediaRecorder createDefaultAudio() {
@@ -82,8 +87,7 @@ public class AudioRecorder {
             mRecorder.setAudioSamplingRate(AUDIO_SAMPLE_RATE);
             mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
             mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);// AMR_WB\AAC\AMR_NB\DEFAULT
-            mRecorder.setMaxDuration(30);
-            mRecorder.prepare();
+            mRecorder.setMaxDuration(30000);
         } catch (IOException e) {
             e.printStackTrace();
         }

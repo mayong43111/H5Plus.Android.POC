@@ -113,7 +113,7 @@ public class EnglishActivity extends AppCompatActivity {
     @AfterPermissionGranted(RC_RECORD_AUDIO)
     private Boolean startAudioRecording() {
 
-        String[] perms = {android.Manifest.permission.RECORD_AUDIO, Manifest.permission.ACCESS_FINE_LOCATION};
+        String[] perms = {android.Manifest.permission.RECORD_AUDIO};
         if (EasyPermissions.hasPermissions(this, perms)) {
             AudioRecorder.getInstance().startRecord();
             return true;
