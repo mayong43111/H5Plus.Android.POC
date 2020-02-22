@@ -24,7 +24,8 @@ import dc.squareup.okhttp.OkHttpClient;
 import dc.squareup.okhttp.Request;
 import dc.squareup.okhttp.RequestBody;
 import dc.squareup.okhttp.Response;
-import io.dcloud.common.adapter.util.PermissionUtil;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 
 public class EnglishActivity extends AppCompatActivity {
 
@@ -35,7 +36,7 @@ public class EnglishActivity extends AppCompatActivity {
 
     public static final MediaType HTTP_FORM
             = MediaType.parse("application/x-www-form-urlencoded");
-
+    public static final int RC_RECORD_AUDIO = 100; //只要不重复就行
     public static final String EnglishAssistantGrantType = "XueLe";
     public static final String EnglishAssistantID = "useridxxxx";
     public static final String EnglishAssistantSecret = "2FDA0803-2202-40EB-824D-28CDDC3A2FE4";
@@ -86,15 +87,42 @@ public class EnglishActivity extends AppCompatActivity {
                         }
                         break;
                     case "VOICE_START":
+                        startAudioRecording();
                         function.onCallBack("ok");
                         break;
                     case "VOICE_STOP":
+                        String audioString = AudioRecorder.getInstance().stopRecord();
+                        function.onCallBack(audioString);
                         break;
                 }
             }
         });
 
         webView.loadUrl(EnglishAssistantScenarioLessonUrl);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        // Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @AfterPermissionGranted(RC_RECORD_AUDIO)
+    private Boolean startAudioRecording() {
+
+        String[] perms = {android.Manifest.permission.RECORD_AUDIO};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+            AudioRecorder.getInstance().startRecord();
+            return true;
+        } else {
+            // Do not have permissions, request them now
+            EasyPermissions.requestPermissions(this, getString(R.string.record_audio_rationale),
+                    RC_RECORD_AUDIO, perms);
+
+            return false;
+        }
     }
 
     //WebChromeClient主要辅助WebView处理Javascript的对话框、网站图标、网站title、加载进度等
