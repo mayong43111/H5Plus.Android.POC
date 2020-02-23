@@ -6,6 +6,7 @@ import android.app.Application;
 import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -100,6 +101,15 @@ public class EnglishActivity extends AppCompatActivity {
         });
 
         webView.loadUrl(EnglishAssistantScenarioLessonUrl);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && webView.canGoBack()) {
+            webView.goBack();//返回上个页面
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);//退出整个应用程序
     }
 
     @Override
