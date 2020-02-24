@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8"/>
-		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
-		<meta name="misapplication-tap-highlight" content="no"/>
-		<meta name="HandheldFriendly" content="true"/>
-		<meta name="MobileOptimized" content="320"/>
-		<title>Hello H5+</title>
-		<script type="text/javascript" src="js/update.js"></script>
-		<script type="text/javascript" charset="utf-8">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta name="misapplication-tap-highlight" content="no"/>
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="MobileOptimized" content="320"/>
+    <title>Hello H5+</title>
+    <script type="text/javascript" src="js/update.js"></script>
+    <script type="text/javascript" src="js/EnglishWebViewFeature.js"></script>
+    <script type="text/javascript" charset="utf-8">
 //取消浏览器的所有事件，使得active的样式在手机上正常生效
 document.addEventListener('touchstart',function(){
     return false;
@@ -107,17 +109,11 @@ function openAbout(){
 
 function startEnglishActivity()
 {
-	var main = plus.android.runtimeMainActivity();
-	var Intent = plus.android.importClass("android.content.Intent");
-	var intent = new Intent(main.getIntent());
-	intent.setClassName(main, "io.dcloud.HelloH5.EnglishActivity");
-	intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-	//intent.putExtra("extra", "需要传递的数据");	//传递数据
-	main.startActivity(intent);
+	plus.EnglishWebView.startEnglishWebView('参数一', '参数二');
 }
-		</script>
-		<link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8"/>
-		<style type="text/css">
+    </script>
+    <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8"/>
+    <style type="text/css">
 li {
 	padding:0.8em;
 	border-bottom:1px solid #eaeaea;
@@ -135,184 +131,185 @@ li:active {
 	font-size:0.8em;
 	color:#838383;
 }
-		</style>
-	</head>
-	<body onselectstart="return false;">
-		<ul id="plist" style="list-style:none;margin:0;padding:0;text-align:left;">
-			<li onclick="startEnglishActivity()">
+
+    </style>
+</head>
+<body onselectstart="return false;">
+<ul id="plist" style="list-style:none;margin:0;padding:0;text-align:left;">
+    <li onclick="startEnglishActivity()">
 				<span class="item">小英助手
 					<div class="chs">启动一个新的Activity</div>
 				</span>
-			</li>
-			<li id="plus/accelerometer.html" onclick="clicked(this.id, 'Accelerometer')">
+    </li>
+    <li id="plus/accelerometer.html" onclick="clicked(this.id, 'Accelerometer')">
 				<span class="item">Accelerometer
 					<div class="chs">加速度传感器</div>
 				</span>
-			</li>
-			<li id="plus/audio.html" onclick="clicked(this.id, 'Audio')">
+    </li>
+    <li id="plus/audio.html" onclick="clicked(this.id, 'Audio')">
 				<span class="item">Audio
 					<div class="chs">音频录制/播放</div>
 				</span>
-			</li>
-			<li id="plus/barcode.html" onclick="clicked(this.id, 'Barcode')">
+    </li>
+    <li id="plus/barcode.html" onclick="clicked(this.id, 'Barcode')">
 				<span class="item">Barcode
 					<div class="chs">二维码扫描</div>
 				</span>
-			</li>
-			<li id="plus/bluetooth.html" onclick="clicked(this.id, 'Bluetooth')">
+    </li>
+    <li id="plus/bluetooth.html" onclick="clicked(this.id, 'Bluetooth')">
 				<span class="item">Bluetooth
 					<div class="chs">蓝牙</div>
 				</span>
-			</li>
-			<li id="plus/camera.html" onclick="clicked(this.id, 'Camera')">
+    </li>
+    <li id="plus/camera.html" onclick="clicked(this.id, 'Camera')">
 				<span class="item">Camera
 					<div class="chs">摄像头拍照/录像</div>
 				</span>
-			</li>
-			<li id="plus/device.html" onclick="clicked(this.id, 'Device')">
+    </li>
+    <li id="plus/device.html" onclick="clicked(this.id, 'Device')">
 				<span class="item">Device
 					<div class="chs">设备信息</div>
 				</span>
-			</li>
-			<li id="plus/downloader.html" onclick="clicked(this.id, 'Downloader')">
+    </li>
+    <li id="plus/downloader.html" onclick="clicked(this.id, 'Downloader')">
 				<span class="item">Downloader
 					<div class="chs">下载管理</div>
 				</span>
-			</li>
-			<li id="plus/events.html" onclick="clicked(this.id, 'Events')">
+    </li>
+    <li id="plus/events.html" onclick="clicked(this.id, 'Events')">
 				<span class="item">Events
 					<div class="chs">系统事件</div>
 				</span>
-			</li>
-			<li id="plus/file.html" onclick="clicked(this.id, 'File System', 'io')">
+    </li>
+    <li id="plus/file.html" onclick="clicked(this.id, 'File System', 'io')">
 				<span class="item">File System
 					<div class="chs">文件系统</div>
 				</span>
-			</li>
-			<li id="plus/gallery.html" onclick="clicked(this.id, 'Gallery')">
+    </li>
+    <li id="plus/gallery.html" onclick="clicked(this.id, 'Gallery')">
 				<span class="item">Gallery
 					<div class="chs">系统相册</div>
 				</span>
-			</li>
-			<li id="plus/geolocation.html" onclick="clicked(this.id, 'Geolocation')">
+    </li>
+    <li id="plus/geolocation.html" onclick="clicked(this.id, 'Geolocation')">
 				<span class="item">Geolocation
 					<div class="chs">地理定位</div>
 				</span>
-			</li>
-			<li id="plus/ibeacon.html" onclick="clicked(this.id, 'iBeacon')">
+    </li>
+    <li id="plus/ibeacon.html" onclick="clicked(this.id, 'iBeacon')">
 				<span class="item">iBeacon
 					<div class="chs">低功耗蓝牙微定位</div>
 				</span>
-			</li>
-			<li id="plus/maps.html" onclick="clicked(this.id, 'Maps')">
+    </li>
+    <li id="plus/maps.html" onclick="clicked(this.id, 'Maps')">
 				<span class="item">Maps
 					<div class="chs">地图</div>
 				</span>
-			</li>
-			<li id="plus/message.html" onclick="clicked(this.id, 'Messaging')">
+    </li>
+    <li id="plus/message.html" onclick="clicked(this.id, 'Messaging')">
 				<span class="item">Messaging
 					<div class="chs">消息通讯</div>
 				</span>
-			</li>
-			<li id="plus/nativeobj.html" onclick="clicked(this.id, 'NativeObj')">
+    </li>
+    <li id="plus/nativeobj.html" onclick="clicked(this.id, 'NativeObj')">
 				<span class="item">NativeObj
 					<div class="chs">原生对象</div>
 				</span>
-			</li>
-			<li id="plus/nativeui.html" onclick="clicked(this.id, 'NativeUI')">
+    </li>
+    <li id="plus/nativeui.html" onclick="clicked(this.id, 'NativeUI')">
 				<span class="item">NativeUI
 					<div class="chs">原生界面</div>
 				</span>
-			</li>
-			<li id="plus/navigator.html" onclick="clicked(this.id, 'Navigator')">
+    </li>
+    <li id="plus/navigator.html" onclick="clicked(this.id, 'Navigator')">
 				<span class="item">Navigator
 					<div class="chs">浏览器环境</div>
 				</span>
-			</li>
-			<li id="plus/oauth.html" onclick="clicked(this.id, 'OAuth')">
+    </li>
+    <li id="plus/oauth.html" onclick="clicked(this.id, 'OAuth')">
 				<span class="item">OAuth
 					<div class="chs">授权登录认证</div>
 				</span>
-			</li>
-			<li id="plus/orientation.html" onclick="clicked(this.id, 'Orientation')">
+    </li>
+    <li id="plus/orientation.html" onclick="clicked(this.id, 'Orientation')">
 				<span class="item">Orientation
 					<div class="chs">方向传感器</div>
 				</span>
-			</li>
-			<li id="plus/payment.html" onclick="clicked(this.id, 'Payment')">
+    </li>
+    <li id="plus/payment.html" onclick="clicked(this.id, 'Payment')">
 				<span class="item">Payment
 					<div class="chs">支付</div>
 				</span>
-			</li>
-			<li id="plus/proximity.html" onclick="clicked(this.id, 'Proximity')">
+    </li>
+    <li id="plus/proximity.html" onclick="clicked(this.id, 'Proximity')">
 				<span class="item">Proximity
 					<div class="chs">距离传感器</div>
 				</span>
-			</li>
-			<li id="plus/push.html" onclick="clicked(this.id, 'Push')">
+    </li>
+    <li id="plus/push.html" onclick="clicked(this.id, 'Push')">
 				<span class="item">Push
 					<div class="chs">消息推送</div>
 				</span>
-			</li>
-			<li id="plus/runtime.html" onclick="clicked(this.id, 'Runtime')">
+    </li>
+    <li id="plus/runtime.html" onclick="clicked(this.id, 'Runtime')">
 				<span class="item">Runtime
 					<div class="chs">运行环境</div>
 				</span>
-			</li>
-			<li id="plus/share.html" onclick="clicked(this.id, 'Share')">
+    </li>
+    <li id="plus/share.html" onclick="clicked(this.id, 'Share')">
 				<span class="item">Share
 					<div class="chs">分享</div>
 				</span>
-			</li>
-			<li id="plus/speech.html" onclick="clicked(this.id, 'Speech')">
+    </li>
+    <li id="plus/speech.html" onclick="clicked(this.id, 'Speech')">
 				<span class="item">Speech
 					<div class="chs">语音识别</div>
 				</span>
-			</li>
-			<li id="plus/statistic.html" onclick="clicked(this.id, 'Statistic')">
+    </li>
+    <li id="plus/statistic.html" onclick="clicked(this.id, 'Statistic')">
 				<span class="item">Statistic
 					<div class="chs">统计管理</div>
 				</span>
-			</li>
-			<li id="plus/storage.html" onclick="clicked(this.id, 'Storage')">
+    </li>
+    <li id="plus/storage.html" onclick="clicked(this.id, 'Storage')">
 				<span class="item">Storage
 					<div class="chs">本地数据存储</div>
 				</span>
-			</li>
-			<li id="plus/uploader.html" onclick="clicked(this.id, 'Uploader')">
+    </li>
+    <li id="plus/uploader.html" onclick="clicked(this.id, 'Uploader')">
 				<span class="item">Uploader
 					<div class="chs">上传管理</div>
 				</span>
-			</li>
-			<li id="plus/video.html" onclick="clicked(this.id, 'Video')">
+    </li>
+    <li id="plus/video.html" onclick="clicked(this.id, 'Video')">
 				<span class="item">Video
 					<div class="chs">视频多媒体</div>
 				</span>
-			</li>
-			<li id="plus/webview.html" onclick="clicked(this.id, 'Webview')">
+    </li>
+    <li id="plus/webview.html" onclick="clicked(this.id, 'Webview')">
 				<span class="item">Webview
 					<div class="chs">窗口管理</div>
 				</span>
-			</li>
-			<li id="plus/xhr.html" onclick="clicked(this.id, 'XMLHttpRequest', 'xhr')">
+    </li>
+    <li id="plus/xhr.html" onclick="clicked(this.id, 'XMLHttpRequest', 'xhr')">
 				<span class="item">XMLHttpRequest
 					<div class="chs">跨域请求</div>
 				</span>
-			</li>
-			<li id="plus/zip.html" onclick="clicked(this.id, 'ZIP')">
+    </li>
+    <li id="plus/zip.html" onclick="clicked(this.id, 'ZIP')">
 				<span class="item">ZIP
 					<div class="chs">文件压缩/解压</div>
 				</span>
-			</li>
-			<li id="plus/njs.html" onclick="clicked(this.id, 'Native.JS')">
+    </li>
+    <li id="plus/njs.html" onclick="clicked(this.id, 'Native.JS')">
 				<span class="item">Native.JS
 					<div class="chs">JS调用原生代码</div>
 				</span>
-			</li>
-		</ul>
-	</body>
-	<script type="text/javascript" src="js/shortcut.js" ></script>
-	<script type="text/javascript">
+    </li>
+</ul>
+</body>
+<script type="text/javascript" src="js/shortcut.js"></script>
+<script type="text/javascript">
 ;(function () {
 	'use strict';
 
@@ -1159,5 +1156,6 @@ document.addEventListener('DOMContentLoaded', function() {
 }, false);
 
 }());
-	</script>
+
+</script>
 </html>
