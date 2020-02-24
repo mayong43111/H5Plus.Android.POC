@@ -7,7 +7,7 @@ import org.json.JSONArray;
 import io.dcloud.common.DHInterface.IWebview;
 import io.dcloud.common.DHInterface.StandardFeature;
 
-public class EnglishWebViewFeature extends StandardFeature {
+    public class EnglishWebViewFeature extends StandardFeature {
 
     public void startEnglishWebView(IWebview webview, JSONArray jsonArray) {
 

@@ -12,6 +12,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.widget.ProgressBar;
 
+import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.github.lzyzsd.jsbridge.BridgeHandler;
 import com.github.lzyzsd.jsbridge.BridgeWebView;
 import com.github.lzyzsd.jsbridge.BridgeWebViewClient;
@@ -33,6 +34,7 @@ public class EnglishActivity extends AppCompatActivity {
 
     private BridgeWebView webView;
     private ProgressBar progressBar;
+    private FloatingActionButton goHomeButton;
     private final Activity currentActivity;
     private final Application currentApplication;
 
@@ -59,6 +61,14 @@ public class EnglishActivity extends AppCompatActivity {
 
         progressBar = (ProgressBar) findViewById(R.id.progressbar);//进度条
         webView = (BridgeWebView) findViewById(R.id.webview);
+        goHomeButton = (FloatingActionButton) findViewById(R.id.goback_continue);
+
+        goHomeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                currentActivity.finish();
+            }
+        });
 
         webView.setWebChromeClient(webChromeClient);
         webView.setWebViewClient(new BridgeWebViewClient(webView) {

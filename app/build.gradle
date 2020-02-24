@@ -57,4 +57,7 @@ dependencies {
 
     //EasyPermissions
     implementation 'pub.devrel:easypermissions:2.0.1'
+
+    //浮动按钮
+    implementation 'com.getbase:floatingactionbutton:1.10.1'
 }
