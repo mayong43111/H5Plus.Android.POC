@@ -3,6 +3,7 @@ package io.dcloud.HelloH5;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -38,14 +39,12 @@ public class EnglishActivity extends AppCompatActivity {
     private final Activity currentActivity;
     private final Application currentApplication;
 
+    private String EnglishAssistantScenarioLessonUrl;
+    private String AccessToken;
+
     public static final MediaType HTTP_FORM
             = MediaType.parse("application/x-www-form-urlencoded");
     public static final int RC_RECORD_AUDIO = 100; //只要不重复就行
-    public static final String EnglishAssistantGrantType = "XueLe";
-    public static final String EnglishAssistantID = "useridxxxx";
-    public static final String EnglishAssistantSecret = "2FDA0803-2202-40EB-824D-28CDDC3A2FE4";
-    public static final String EnglishAssistantOAuthUrl = "https://app-staging.mtutor.engkoo.com/proxy/oauth/login";
-    public static final String EnglishAssistantScenarioLessonUrl = "https://app-staging.mtutor.engkoo.com/dist/app-scenario-lesson/?origin=android-xinfangxiang";
 
     OkHttpClient httpClient = new OkHttpClient();
 
@@ -58,6 +57,10 @@ public class EnglishActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_english);
+
+        Intent intent = getIntent();
+        EnglishAssistantScenarioLessonUrl = intent.getStringExtra("EnglishAssistantScenarioLessonUrl"); // 没有输入值默认为0
+        AccessToken = intent.getStringExtra("AccessToken"); // 没有输入值默认为0
 
         progressBar = (ProgressBar) findViewById(R.id.progressbar);//进度条
         webView = (BridgeWebView) findViewById(R.id.webview);
@@ -92,11 +95,8 @@ public class EnglishActivity extends AppCompatActivity {
 
                 switch (data.toUpperCase()) {
                     case "LOG_IN":
-                        try {
-                            function.onCallBack(loadUserAccessToken());
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                        //function.onCallBack(loadUserAccessToken());
+                        function.onCallBack(AccessToken);
                         break;
                     case "VOICE_START":
                         startAudioRecording();
@@ -180,43 +180,43 @@ public class EnglishActivity extends AppCompatActivity {
         }
     };
 
-    private String loadUserAccessToken() throws InterruptedException {
-
-        RequestBody formBody = new FormEncodingBuilder()
-                .add("grant_type", EnglishAssistantGrantType)
-                .add("id", EnglishAssistantID) //TODO: 学员ID
-                .add("secret", EnglishAssistantSecret)
-                .build();
-
-        Request request = new Request.Builder()
-                .url(EnglishAssistantOAuthUrl)
-                .post(formBody)
-                .build();
-
-        final Object object = new Object();
-        synchronized (object) {
-            final String[] access_token = new String[1];
-
-            httpClient.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Request request, IOException e) {
-                    synchronized (object) {
-                        object.notify();
-                    }
-                }
-
-                @Override
-                public void onResponse(Response response) throws IOException {
-                    if (response.isSuccessful()) {
-                        access_token[0] = response.body().string();
-                    }
-                    synchronized (object) {
-                        object.notify();
-                    }
-                }
-            });
-            object.wait();
-            return access_token[0];
-        }
-    }
+//    private String loadUserAccessToken() throws InterruptedException {
+//
+//        RequestBody formBody = new FormEncodingBuilder()
+//                .add("grant_type", EnglishAssistantGrantType)
+//                .add("id", EnglishAssistantID) //TODO: 学员ID
+//                .add("secret", EnglishAssistantSecret)
+//                .build();
+//
+//        Request request = new Request.Builder()
+//                .url(EnglishAssistantOAuthUrl)
+//                .post(formBody)
+//                .build();
+//
+//        final Object object = new Object();
+//        synchronized (object) {
+//            final String[] access_token = new String[1];
+//
+//            httpClient.newCall(request).enqueue(new Callback() {
+//                @Override
+//                public void onFailure(Request request, IOException e) {
+//                    synchronized (object) {
+//                        object.notify();
+//                    }
+//                }
+//
+//                @Override
+//                public void onResponse(Response response) throws IOException {
+//                    if (response.isSuccessful()) {
+//                        access_token[0] = response.body().string();
+//                    }
+//                    synchronized (object) {
+//                        object.notify();
+//                    }
+//                }
+//            });
+//            object.wait();
+//            return access_token[0];
+//        }
+//    }
 }
