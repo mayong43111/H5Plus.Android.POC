@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -36,6 +38,7 @@ public class EnglishActivity extends AppCompatActivity {
     private BridgeWebView webView;
     private ProgressBar progressBar;
     private FloatingActionButton goHomeButton;
+    private Toolbar toolbar;
     private final Activity currentActivity;
     private final Application currentApplication;
 
@@ -70,6 +73,35 @@ public class EnglishActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 currentActivity.finish();
+            }
+        });
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setNavigationIcon(R.mipmap.ic_toolbar_closed_36);//设置导航栏图标
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        toolbar.inflateMenu(R.menu.english_toolbar_menu);//设置右上角的填充菜单
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int menuItemId = item.getItemId();
+                switch (menuItemId) {
+                    case R.id.action_menu_1:
+                        if (webView.canGoBack()) {
+                            webView.goBack();
+                        }
+                        break;
+                    case R.id.action_menu_2:
+                        if (webView.canGoForward()) {
+                            webView.goForward();
+                        }
+                        break;
+                }
+                return true;
             }
         });
 

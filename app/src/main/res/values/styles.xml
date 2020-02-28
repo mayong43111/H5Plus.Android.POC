@@ -15,4 +15,17 @@
         <item name="android:background">@drawable/fab_label_background</item>
         <item name="android:textColor">@color/white</item>
     </style>
+
+    <style name="Theme.English.ToolBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="actionOverflowButtonStyle">@style/ActionButton.Overflow.English</item>
+    </style>
+
+    <style name="ActionButton.Overflow.English" parent="android:style/Widget.Holo.Light.ActionButton.Overflow">
+        <item name="android:src">@mipmap/ic_toolbar_more_36</item>
+    </style>
+
+    <style name="Theme.ToolBar.Base" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColorPrimary">@color/toolbar_text</item>
+    </style>
 </resources>

@@ -129,7 +129,7 @@
             android:hardwareAccelerated="true"
             android:launchMode="singleTask"
             android:screenOrientation="user"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/Theme.English.ToolBar">
 <!--            <intent-filter>-->
 
 <!--                &lt;!&ndash; <action android:name="android.intent.action.MAIN" /> &ndash;&gt;-->
