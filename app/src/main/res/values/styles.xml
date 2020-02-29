@@ -18,6 +18,9 @@
 
     <style name="Theme.English.ToolBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="actionOverflowButtonStyle">@style/ActionButton.Overflow.English</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:fitsSystemWindows">true</item>
     </style>
 
     <style name="ActionButton.Overflow.English" parent="android:style/Widget.Holo.Light.ActionButton.Overflow">
