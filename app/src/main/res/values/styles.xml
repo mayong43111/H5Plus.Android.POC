@@ -31,4 +31,9 @@
         <item name="android:textSize">20sp</item>
         <item name="android:textColorPrimary">@color/toolbar_text</item>
     </style>
+
+    <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">12sp</item><!--toolbar标题字体大小-->
+        <item name="android:textColor">@color/toolbar_title_text</item><!--toolbar标题字体颜色-->
+    </style>
 </resources>

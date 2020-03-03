@@ -1,8 +1,8 @@
 document.addEventListener('plusready',function () {   //固定模板,不用修改
 
-        var _BARCODE ='EnglishWebView' // ① 插件名称(很重要),变量名和字符串值可自定义
+        var _BARCODE ='EngkooWebView' // ① 插件名称(很重要),变量名和字符串值可自定义
         var bridge = window.plus.bridge //②固定模板,不用修改,
-        var EnglishWebViewPlugin = { //③变量名可自定义
+        var EngkooWebViewPlugin = { //③变量名可自定义
             //该模板做了简单的封装,因为需要调用的逻辑比较简单,而且参数一致,该方法中的参数根据自己需求修改
             callNative:function (fname, args, successCallback) { 
                 var callbackId =this.getCallbackId(successCallback,this.errorCallback) //固定模板,不用修改
@@ -26,9 +26,9 @@ document.addEventListener('plusready',function () {   //固定模板,不用修
                 console.log('Javascript callback error: ' + errorMsg)
             },
             //自定义js方法,但是必须要和扩展类的的方法名称一致,否则无法调用原生api
-            startEnglishWebView:function (argus1, argus2) {
-                this.callNative('startEnglishWebView', [argus1, argus2], null)  //第一个参数方法名称字符串,必须和方法名一致,参数二是要传递的参数
+            startEngkooWebView:function (url, access_token, title) {
+                this.callNative('startEngkooWebView', [url, access_token, title], null)  //第一个参数方法名称字符串,必须和方法名一致,参数二是要传递的参数
             }
         };
-        window.plus.EnglishWebView = EnglishWebViewPlugin //固定模板,示例:window.plus.插件名 = 同注释③变量名一致
+        window.plus.EngkooWebView = EngkooWebViewPlugin //固定模板,示例:window.plus.插件名 = 同注释③变量名一致
 },true);

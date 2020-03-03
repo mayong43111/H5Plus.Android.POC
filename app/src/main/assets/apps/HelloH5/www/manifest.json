@@ -19,7 +19,7 @@
     "portrait"
   ],
   "permissions": {
-    "EnglishWebView": {
+    "EngkooWebView": {
       "description": "小英助手"
     },
     "Contacts": {

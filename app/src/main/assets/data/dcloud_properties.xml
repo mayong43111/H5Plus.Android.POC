@@ -64,7 +64,7 @@
         <feature name="Bluetooth" value="io.dcloud.feature.bluetooth.BluetoothFeature" />
         <feature name="Sqlite" value="io.dcloud.feature.sqlite.DataBaseFeature" />
         <!--小英插件-->
-        <feature name="EnglishWebView" value="io.dcloud.HelloH5.EnglishWebViewFeature" />
+        <feature name="EngkooWebView" value="io.dcloud.HelloH5.EngkooWebViewFeature" />
     </features>
 
     <services>

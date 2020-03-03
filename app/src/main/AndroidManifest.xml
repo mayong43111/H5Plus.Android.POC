@@ -124,19 +124,12 @@
         android:usesCleartextTraffic="true"
         tools:ignore="HardcodedDebugMode">
         <activity
-            android:name=".EnglishActivity"
+            android:name=".EngkooActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|navigation"
             android:hardwareAccelerated="true"
             android:launchMode="singleTask"
             android:screenOrientation="user"
-            android:theme="@style/Theme.English.ToolBar">
-<!--            <intent-filter>-->
-
-<!--                &lt;!&ndash; <action android:name="android.intent.action.MAIN" /> &ndash;&gt;-->
-
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-        </activity>
+            android:theme="@style/Theme.English.ToolBar"></activity>
         <activity
             android:name="io.dcloud.PandoraEntry"
             android:configChanges="orientation|keyboardHidden|keyboard|navigation"
