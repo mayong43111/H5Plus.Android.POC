@@ -9,7 +9,7 @@
   "icons": {
     "144": "icon.png"
   },
-  "launch_path": "index.html",
+  "launch_path": "https://mayong43111.github.io/H5Plus.WebApp.POC/",
   "developer": {
     "name": "yanyilin",
     "email": "yanyilin@dcloud.io",
@@ -81,7 +81,7 @@
     },
     "launchwebview": {
       "titleNView": {
-        "titleText": "Hello H5+",
+        "titleText": "XueDa POC",
         "titleColor": "#CCCCCC",
         "backgroundColor": "#D74B28",
         "buttons": [
