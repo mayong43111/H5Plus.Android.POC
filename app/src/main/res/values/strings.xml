@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">HBuilder-Hello</string>
     <string name="record_audio_rationale">需要使用录音权限</string>
+    <string name="camera_and_location_rationale">需要照相机权限</string>
     <string name="toolbar_menu_1">菜单一</string>
     <string name="toolbar_menu_2">菜单二</string>
+    <string name="title_login_detect_face">LoginDetectFaceActivity</string>
 </resources>

@@ -124,12 +124,22 @@
         android:usesCleartextTraffic="true"
         tools:ignore="HardcodedDebugMode">
         <activity
+            android:name=".LoginDetectFaceActivity"
+            android:label="@string/title_login_detect_face"
+            android:theme="@style/Theme.English.ToolBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".EngkooActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|navigation"
             android:hardwareAccelerated="true"
             android:launchMode="singleTask"
             android:screenOrientation="user"
-            android:theme="@style/Theme.English.ToolBar"></activity>
+            android:theme="@style/Theme.English.ToolBar" />
         <activity
             android:name="io.dcloud.PandoraEntry"
             android:configChanges="orientation|keyboardHidden|keyboard|navigation"
@@ -139,11 +149,7 @@
             android:screenOrientation="user"
             android:theme="@style/TranslucentTheme"
             android:windowSoftInputMode="adjustResize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity> <!-- Statistic(统计)-友盟统计 begin -->
         <!-- 官方网站：http://www.umeng.com/analytics -->
         <!-- meta-data节点android:name="UMENG_APPKEY"项中android:value值为友盟网站申请的APPKEY -->
