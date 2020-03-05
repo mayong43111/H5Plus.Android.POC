@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
@@ -20,7 +21,12 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -37,7 +43,6 @@ public class LoginDetectFaceActivity extends AppCompatActivity {
 
     private static final int REQUEST_CAMERA_PERMISSION = 1;
 
-    ImageView mIvFace;
     private CameraView mCameraView;
     private Handler mBackgroundHandler;
     long lastModirTime;
@@ -86,11 +91,13 @@ public class LoginDetectFaceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login_detect_face);
 
         mCameraView = findViewById(R.id.camera);
-        mIvFace = findViewById(R.id.iv_face_pic);
 
         if (mCameraView != null) {
             mCameraView.addCallback(mCallback);
         }
+
+        initToolbar();
+        initStatusBarColor();
     }
 
     @Override
@@ -148,6 +155,32 @@ public class LoginDetectFaceActivity extends AppCompatActivity {
                 break;
         }
     }
+
+    private void initToolbar() {
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setNavigationIcon(R.mipmap.ic_toolbar_closed_36);//设置导航栏图标
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+    }
+
+    private void initStatusBarColor() {
+        // 5.0以上系统状态栏透明
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(Color.TRANSPARENT);
+        }
+    }
+
+
 
     private Handler getBackgroundHandler() {
         if (mBackgroundHandler == null) {
