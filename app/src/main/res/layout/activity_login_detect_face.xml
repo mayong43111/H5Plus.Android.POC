@@ -5,37 +5,39 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/toolbar_background"
-    tools:context=".LoginDetectFaceActivity">
+    tools:context=".LoginDetectFaceActivity"
+    tools:ignore="RelativeOverlap">
 
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <SurfaceView
-            android:id="@+id/preview"
+        <io.dcloud.HelloH5.camera.CameraView
+            android:id="@+id/camera"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <io.dcloud.HelloH5.FindFaceView
-            android:id="@+id/my_preview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <RelativeLayout
-            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:background="#3fffffff"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp">
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:adjustViewBounds="true"
+            android:background="@android:color/black"
+            app:facing="front" />
 
-            <Button
-                android:id="@+id/bt_camera"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_centerInParent="true"
-                android:background="@drawable/camera_button_selector" />
-        </RelativeLayout>
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true" />
 
-    </FrameLayout>
+        <ImageView
+            android:id="@+id/iv_face_pic"
+            android:layout_width="100dp"
+            android:layout_height="140dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true" />
+
+    </RelativeLayout>
 </android.support.constraint.ConstraintLayout>
