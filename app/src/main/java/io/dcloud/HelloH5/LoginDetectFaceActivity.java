@@ -3,6 +3,7 @@ package io.dcloud.HelloH5;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,12 +23,11 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
@@ -72,17 +72,35 @@ public class LoginDetectFaceActivity extends AppCompatActivity {
                 @Override
                 public void onCallBack(Bitmap bitmap, List<Rect> rects) {
 
-                    mCameraView.stop();
-                    for (int i = 0; i < rects.size(); i++) {//返回的rect就是在TexutView上面的人脸对应的实际坐标
-
-                        Toast.makeText(LoginDetectFaceActivity.this, "识别成功!", Toast.LENGTH_LONG).show();
-                        Log.i("janecer", "rect : left " + rects.get(i).left + " top " + rects.get(i).top + "  right " + rects.get(i).right + "  bottom " + rects.get(i).bottom);
+                    if (0 == rects.size()) {
+                        return;
                     }
+
+                    Intent data = new Intent();
+                    data.putExtra("return_data", getFaceImgBase64(bitmap, rects.get(0)));
+                    setResult(1, data);
+                    finish();
+//                    for (int i = 0; i < rects.size(); i++) {//返回的rect就是在TexutView上面的人脸对应的实际坐标
+//
+//                        Toast.makeText(LoginDetectFaceActivity.this, "识别成功!", Toast.LENGTH_LONG).show();
+//                        Log.i("janecer", "rect : left " + rects.get(i).left + " top " + rects.get(i).top + "  right " + rects.get(i).right + "  bottom " + rects.get(i).bottom);
+//                    }
                 }
             }));
             lastModirTime = System.currentTimeMillis();
         }
     };
+
+    private String getFaceImgBase64(Bitmap bitmap, Rect rect) {
+
+        //Bitmap newBitmap = BitmapCut.ImageCropWithRect(bitmap, rect);
+        Bitmap newBitmap = BitmapCut.DrawRectangles(bitmap, rect);
+        newBitmap = BitmapCut.HorizontalRotaingImageView(newBitmap);
+        newBitmap = BitmapCut.RotaingImageView(newBitmap, 90);
+        byte[] bitmapBytes = BitmapCut.readBitmap(newBitmap);
+
+        return android.util.Base64.encodeToString(bitmapBytes, Base64.NO_WRAP);
+    }
 
 
     @Override
@@ -179,7 +197,6 @@ public class LoginDetectFaceActivity extends AppCompatActivity {
             window.setStatusBarColor(Color.TRANSPARENT);
         }
     }
-
 
 
     private Handler getBackgroundHandler() {

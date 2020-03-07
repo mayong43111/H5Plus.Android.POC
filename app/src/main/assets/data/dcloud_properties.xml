@@ -65,6 +65,7 @@
         <feature name="Sqlite" value="io.dcloud.feature.sqlite.DataBaseFeature" />
         <!--小英插件-->
         <feature name="EngkooWebView" value="io.dcloud.HelloH5.EngkooWebViewFeature" />
+        <feature name="XueDaFeature" value="io.dcloud.HelloH5.XueDaFeature" />
     </features>
 
     <services>
