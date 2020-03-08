@@ -124,10 +124,12 @@
         android:usesCleartextTraffic="true"
         tools:ignore="HardcodedDebugMode">
         <activity
+            android:name=".LoginDetectFaceActivity2"
+            android:theme="@style/Theme.English.ToolBar"></activity>
+        <activity
             android:name=".LoginDetectFaceActivity"
             android:label="@string/title_login_detect_face"
-            android:theme="@style/Theme.English.ToolBar">
-        </activity>
+            android:theme="@style/Theme.English.ToolBar"></activity>
         <activity
             android:name=".EngkooActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|navigation"

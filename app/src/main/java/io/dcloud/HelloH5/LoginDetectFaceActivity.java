@@ -30,12 +30,21 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import org.opencv.android.Utils;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfRect;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.objdetect.CascadeClassifier;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
 import io.dcloud.HelloH5.camera.CameraView;
 import io.dcloud.HelloH5.camera.FaceSDK;
+import io.dcloud.HelloH5.camera2.FaceSDKWithOpenCV;
 
 public class LoginDetectFaceActivity extends AppCompatActivity {
 
@@ -43,6 +52,7 @@ public class LoginDetectFaceActivity extends AppCompatActivity {
 
     private static final int REQUEST_CAMERA_PERMISSION = 1;
 
+    private FaceSDKWithOpenCV mFaceSDK;
     private CameraView mCameraView;
     private Handler mBackgroundHandler;
     long lastModirTime;
@@ -64,11 +74,17 @@ public class LoginDetectFaceActivity extends AppCompatActivity {
 
         @Override
         public void onPreviewFrame(final byte[] data, final Camera camera) {
-            if (System.currentTimeMillis() - lastModirTime <= 200 || data == null || data.length == 0) {
+
+            if (lastModirTime == 0) {
+                lastModirTime = System.currentTimeMillis();
+                return;
+            }
+
+            if ((System.currentTimeMillis() - lastModirTime) <= 200 || data == null || data.length == 0) {
                 return;
             }
             Log.i(TAG, "onPreviewFrame " + (data == null ? null : data.length));
-            getBackgroundHandler().post(new FaceThread(data, camera, new FaceSDKCallBackFunction() {
+            getBackgroundHandler().post(new FaceThread(data, camera, mFaceSDK, new FaceSDKCallBackFunction() {
                 @Override
                 public void onCallBack(Bitmap bitmap, List<Rect> rects) {
 
@@ -80,11 +96,6 @@ public class LoginDetectFaceActivity extends AppCompatActivity {
                     data.putExtra("return_data", getFaceImgBase64(bitmap, rects.get(0)));
                     setResult(1, data);
                     finish();
-//                    for (int i = 0; i < rects.size(); i++) {//返回的rect就是在TexutView上面的人脸对应的实际坐标
-//
-//                        Toast.makeText(LoginDetectFaceActivity.this, "识别成功!", Toast.LENGTH_LONG).show();
-//                        Log.i("janecer", "rect : left " + rects.get(i).left + " top " + rects.get(i).top + "  right " + rects.get(i).right + "  bottom " + rects.get(i).bottom);
-//                    }
                 }
             }));
             lastModirTime = System.currentTimeMillis();
@@ -93,10 +104,7 @@ public class LoginDetectFaceActivity extends AppCompatActivity {
 
     private String getFaceImgBase64(Bitmap bitmap, Rect rect) {
 
-        //Bitmap newBitmap = BitmapCut.ImageCropWithRect(bitmap, rect);
         Bitmap newBitmap = BitmapCut.DrawRectangles(bitmap, rect);
-        newBitmap = BitmapCut.HorizontalRotaingImageView(newBitmap);
-        newBitmap = BitmapCut.RotaingImageView(newBitmap, 90);
         byte[] bitmapBytes = BitmapCut.readBitmap(newBitmap);
 
         return android.util.Base64.encodeToString(bitmapBytes, Base64.NO_WRAP);
@@ -113,6 +121,8 @@ public class LoginDetectFaceActivity extends AppCompatActivity {
         if (mCameraView != null) {
             mCameraView.addCallback(mCallback);
         }
+
+        mFaceSDK = new FaceSDKWithOpenCV(this);
 
         initToolbar();
         initStatusBarColor();
@@ -265,74 +275,109 @@ public class LoginDetectFaceActivity extends AppCompatActivity {
     }
 
     private class FaceThread implements Runnable {
+
         private byte[] mData;
-        private ByteArrayOutputStream mBitmapOutput;
-        private Matrix mMatrix;
+        private Mat mSrcMat;
+        private Mat mDesMat;
+        //        private ByteArrayOutputStream mBitmapOutput;
+//        private Matrix mMatrix;
         private Camera mCamera;
         private FaceSDKCallBackFunction mCallBackFunction;
+        private FaceSDKWithOpenCV mFaceSDK;
 
-        public FaceThread(byte[] data, Camera camera, FaceSDKCallBackFunction callBackFunction) {
+        public FaceThread(byte[] data, Camera camera, FaceSDKWithOpenCV faceSDK, FaceSDKCallBackFunction callBackFunction) {
             mData = data;
-            mBitmapOutput = new ByteArrayOutputStream();
-            mMatrix = new Matrix();
-            int mOrienta = mCameraView.getCameraDisplayOrientation();
-            mMatrix.postRotate(mOrienta * -1);
-            mMatrix.postScale(-1, 1);//默认是前置摄像头，直接写死 -1 。
+//            mBitmapOutput = new ByteArrayOutputStream();
+//            mMatrix = new Matrix();
+//            int mOrienta = mCameraView.getCameraDisplayOrientation();
+//            mMatrix.postRotate(mOrienta * -1);
+//            mMatrix.postScale(-1, 1);//默认是前置摄像头，直接写死 -1 。
             mCamera = camera;
+            mFaceSDK = faceSDK;
             mCallBackFunction = callBackFunction;
         }
 
         @Override
         public void run() {
-            Log.i(TAG, "thread is run");
-            Bitmap bitmap = null;
-            Bitmap roteBitmap = null;
             try {
                 Camera.Parameters parameters = mCamera.getParameters();
                 int width = parameters.getPreviewSize().width;
                 int height = parameters.getPreviewSize().height;
 
-                YuvImage yuv = new YuvImage(mData, parameters.getPreviewFormat(), width, height, null);
-                mData = null;
-                yuv.compressToJpeg(new Rect(0, 0, width, height), 100, mBitmapOutput);
+                mSrcMat = new Mat(height, width, CvType.CV_8UC1);
+                mDesMat = new Mat(height, width, CvType.CV_8UC1);
 
-                byte[] bytes = mBitmapOutput.toByteArray();
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inPreferredConfig = Bitmap.Config.RGB_565;//必须设置为565，否则无法检测
-                bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+                mSrcMat.put(0, 0, mData);
+                Core.rotate(mSrcMat, mSrcMat, Core.ROTATE_90_COUNTERCLOCKWISE);
+                Core.flip(mSrcMat, mSrcMat, 1);
+                Imgproc.cvtColor(mSrcMat, mDesMat, Imgproc.COLOR_YUV2GRAY_420);
 
-                mBitmapOutput.reset();
-                roteBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), mMatrix, false);
-                List<Rect> rects = FaceSDK.detectionBitmap(bitmap, getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().heightPixels);
+                List<Rect> rects = mFaceSDK.detect(mDesMat, width, height);
 
-                if (null == rects || rects.size() == 0) {
-                    Log.i("janecer", "没有检测到人脸哦");
-                } else {
-                    Log.i("janecer", "检测到有" + rects.size() + "人脸");
+                if (null != rects && rects.size() != 0) {
                     //回调
+                    Log.i(TAG, "检测到有" + rects.size() + "人脸");
+                    Bitmap bitmap = Bitmap.createBitmap(height, width, Bitmap.Config.RGB_565); // 因为旋转，高宽颠倒了
+                    Utils.matToBitmap(mSrcMat, bitmap);
                     mCallBackFunction.onCallBack(bitmap, rects);
                 }
 
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                mMatrix = null;
-                if (bitmap != null) {
-                    bitmap.recycle();
-                }
-                if (roteBitmap != null) {
-                    roteBitmap.recycle();
-                }
-
-                if (mBitmapOutput != null) {
-                    try {
-                        mBitmapOutput.close();
-                        mBitmapOutput = null;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
             }
         }
+//        @Override
+//        public void run() {
+//            Log.i(TAG, "thread is run");
+//            Bitmap bitmap = null;
+//            Bitmap roteBitmap = null;
+//            try {
+//                Camera.Parameters parameters = mCamera.getParameters();
+//                int width = parameters.getPreviewSize().width;
+//                int height = parameters.getPreviewSize().height;
+//
+//                YuvImage yuv = new YuvImage(mData, parameters.getPreviewFormat(), width, height, null);
+//                mData = null;
+//                yuv.compressToJpeg(new Rect(0, 0, width, height), 100, mBitmapOutput);
+//
+//                byte[] bytes = mBitmapOutput.toByteArray();
+//                BitmapFactory.Options options = new BitmapFactory.Options();
+//                options.inPreferredConfig = Bitmap.Config.RGB_565;//必须设置为565，否则无法检测
+//                bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+//
+//                mBitmapOutput.reset();
+//                roteBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), mMatrix, false);
+//                List<Rect> rects = FaceSDK.detectionBitmap(bitmap, getResources().getDisplayMetrics().widthPixels, getResources().getDisplayMetrics().heightPixels);
+//
+//                if (null == rects || rects.size() == 0) {
+//                    Log.i("janecer", "没有检测到人脸哦");
+//                } else {
+//                    Log.i("janecer", "检测到有" + rects.size() + "人脸");
+//                    //回调
+//                    mCallBackFunction.onCallBack(bitmap, rects);
+//                }
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            } finally {
+//                mMatrix = null;
+//                if (bitmap != null) {
+//                    bitmap.recycle();
+//                }
+//                if (roteBitmap != null) {
+//                    roteBitmap.recycle();
+//                }
+//
+//                if (mBitmapOutput != null) {
+//                    try {
+//                        mBitmapOutput.close();
+//                        mBitmapOutput = null;
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        }
     }
 }

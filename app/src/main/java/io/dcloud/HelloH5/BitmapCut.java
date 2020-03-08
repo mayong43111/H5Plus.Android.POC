@@ -168,6 +168,10 @@ public class BitmapCut {
 
     public static Bitmap DrawRectangles(Bitmap bitmap, Rect rect) {
 
+        if (rect == null) {
+            return bitmap;
+        }
+
         Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
         Canvas canvas = new Canvas(mutableBitmap);
 
