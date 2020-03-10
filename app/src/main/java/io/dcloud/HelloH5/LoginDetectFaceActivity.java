@@ -83,6 +83,7 @@ public class LoginDetectFaceActivity extends AppCompatActivity {
             if ((System.currentTimeMillis() - lastModirTime) <= 200 || data == null || data.length == 0) {
                 return;
             }
+
             Log.i(TAG, "onPreviewFrame " + (data == null ? null : data.length));
             getBackgroundHandler().post(new FaceThread(data, camera, mFaceSDK, new FaceSDKCallBackFunction() {
                 @Override
@@ -304,12 +305,13 @@ public class LoginDetectFaceActivity extends AppCompatActivity {
                 int width = parameters.getPreviewSize().width;
                 int height = parameters.getPreviewSize().height;
 
-                mSrcMat = new Mat(height, width, CvType.CV_8UC1);
-                mDesMat = new Mat(height, width, CvType.CV_8UC1);
+                mSrcMat = new Mat(height, width, CvType.CV_8UC1);//CV_8UC1---则可以创建----8位无符号的单通道---灰度图片
 
                 mSrcMat.put(0, 0, mData);
                 Core.rotate(mSrcMat, mSrcMat, Core.ROTATE_90_COUNTERCLOCKWISE);
                 Core.flip(mSrcMat, mSrcMat, 1);
+
+                mDesMat = new Mat(width, height, CvType.CV_8UC1);//旋转了90度
                 Imgproc.cvtColor(mSrcMat, mDesMat, Imgproc.COLOR_YUV2GRAY_420);
 
                 List<Rect> rects = mFaceSDK.detect(mDesMat, width, height);
@@ -317,14 +319,43 @@ public class LoginDetectFaceActivity extends AppCompatActivity {
                 if (null != rects && rects.size() != 0) {
                     //回调
                     Log.i(TAG, "检测到有" + rects.size() + "人脸");
-                    Bitmap bitmap = Bitmap.createBitmap(height, width, Bitmap.Config.RGB_565); // 因为旋转，高宽颠倒了
-                    Utils.matToBitmap(mSrcMat, bitmap);
-                    mCallBackFunction.onCallBack(bitmap, rects);
+
+                    ByteArrayOutputStream bitmapOutput = new ByteArrayOutputStream();
+
+                    try {
+                        YuvImage yuv = new YuvImage(mData, parameters.getPreviewFormat(), width, height, null);
+                        yuv.compressToJpeg(new Rect(0, 0, width, height), 100, bitmapOutput);
+
+                        byte[] bytes = bitmapOutput.toByteArray();
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        bitmapOutput.reset();
+
+                        // 旋转图片 动作
+                        Matrix matrix = new Matrix();
+                        matrix.setScale(-1, 1); //水平旋转
+                        matrix.postRotate(90);//转正
+                        // 创建新的图片
+                        bitmap = Bitmap.createBitmap(bitmap, 0, 0,
+                                bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
+                        mCallBackFunction.onCallBack(bitmap, rects);
+                    } finally {
+                        if (bitmapOutput != null) {
+                            try {
+                                bitmapOutput.close();
+                                bitmapOutput = null;
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
                 }
 
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
+                mData = null;
             }
         }
 //        @Override
