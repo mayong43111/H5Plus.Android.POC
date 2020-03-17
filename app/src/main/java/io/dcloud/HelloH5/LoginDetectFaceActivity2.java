@@ -66,7 +66,7 @@ public class LoginDetectFaceActivity2 extends AppCompatActivity implements
             return true;
         } else {
             // Do not have permissions, request them now
-            EasyPermissions.requestPermissions(this, getString(R.string.camera_and_location_rationale),
+            EasyPermissions.requestPermissions(this, getString(R.string.camera_rationale),
                     RC_CAMERA, perms);
 
             return false;

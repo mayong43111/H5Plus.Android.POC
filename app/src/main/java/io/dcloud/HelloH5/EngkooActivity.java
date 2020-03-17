@@ -1,11 +1,19 @@
 package io.dcloud.HelloH5;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StrictMode;
+import android.provider.MediaStore;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +29,16 @@ import com.github.lzyzsd.jsbridge.BridgeWebViewClient;
 import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.sina.weibo.sdk.share.BaseActivity;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import io.dcloud.common.util.JSUtil;
+import io.dcloud.common.util.ThreadPool;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -28,6 +46,15 @@ import pub.devrel.easypermissions.EasyPermissions;
 public class EngkooActivity extends BaseActivity {
 
     public static final int RC_RECORD_AUDIO = 100; //只要不重复就行
+    public static final int RC_CAMERA = 101; //只要不重复就行
+    public static final int RC_READ_EXTERNAL_STORAGE = 102; //只要不重复就行
+
+    public static final int IMAGE_CHOOSE_RESULT_CODE = 1; //只要不重复就行
+    public static final int IMAGE_SHOOT_RESULT_CODE = 2; //只要不重复就行
+
+    private final Activity currentActivity;
+    private String currentCameraDestFile;
+    private CallBackFunction currentFunction;
 
     private BridgeWebView webView;
     private ProgressBar progressBar;
@@ -37,7 +64,8 @@ public class EngkooActivity extends BaseActivity {
     private String englishAssistantScenarioLessonUrl;
     private String accessToken;
 
-    public EngkooActivity(){
+    public EngkooActivity() {
+        currentActivity = this;
     }
 
     @Override
@@ -45,11 +73,43 @@ public class EngkooActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_engkoo);
 
+        //Android 7.0 FileUriExposedException 解决
+        if (Build.VERSION.SDK_INT >= 24) {
+            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+            StrictMode.setVmPolicy(builder.build());
+        }
+
         initStatusBarColor();
         initToolbar();
         initWebView();
 
         startEngkooWebView();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (currentFunction == null) {
+            return;
+        }
+
+        switch (requestCode) {
+            case IMAGE_CHOOSE_RESULT_CODE:
+                Uri uri = data.getData();
+                String filePath = FileUtil.getFilePathByUri(this, uri);
+
+                if (!TextUtils.isEmpty(filePath)) {
+                    callbackWebView(currentFunction, Jpg2String(filePath));
+                }
+                break;
+            case IMAGE_SHOOT_RESULT_CODE:
+                if (resultCode == Activity.RESULT_OK && !TextUtils.isEmpty(currentCameraDestFile)) {
+                    callbackWebView(currentFunction, Jpg2String(currentCameraDestFile));
+                }
+                currentCameraDestFile = null;
+                break;
+        }
     }
 
     private void startEngkooWebView() {
@@ -86,19 +146,99 @@ public class EngkooActivity extends BaseActivity {
             @Override
             public void handler(String data, final CallBackFunction function) {
 
+                currentFunction = function;
+
                 switch (data.toUpperCase()) {
                     case "LOG_IN":
-                        function.onCallBack(accessToken);
+                        callbackWebView(function, accessToken);
                         break;
                     case "VOICE_START":
                         startAudioRecording();
-                        function.onCallBack("ok");
+                        callbackWebView(function, "ok");
                         break;
                     case "VOICE_STOP":
                         String audioString = AudioRecorder.getInstance().stopRecord();
-                        function.onCallBack(audioString);
+                        callbackWebView(function, audioString);
                         break;
                 }
+            }
+        });
+
+        webView.registerHandler("NameRequestFromWeb", new BridgeHandler() {
+
+            @Override
+            public void handler(String data, final CallBackFunction function) {
+
+                currentFunction = function;
+
+                switch (data.toUpperCase()) {
+                    case "IMAGE_CHOOSE":
+                        imageChoose();
+                        break;
+                    case "IMAGE_SHOOT":
+                        imageShoot();
+                        break;
+                }
+            }
+        });
+    }
+
+    @AfterPermissionGranted(RC_READ_EXTERNAL_STORAGE)
+    private void imageChoose() {
+
+        String[] perms = {Manifest.permission.READ_EXTERNAL_STORAGE};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+            startActivityForResult(intent, IMAGE_CHOOSE_RESULT_CODE);
+        } else {
+            // Do not have permissions, request them now
+            EasyPermissions.requestPermissions(this, getString(R.string.storage_rationale),
+                    RC_READ_EXTERNAL_STORAGE, perms);
+        }
+    }
+
+    @AfterPermissionGranted(RC_CAMERA)
+    private void imageShoot() {
+
+        String[] perms = {Manifest.permission.CAMERA};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+            Date curDate = new Date(System.currentTimeMillis());
+
+            File destFile = new File(
+                    Environment.getExternalStorageDirectory(),
+                    "xd_" + formatter.format(curDate) + ".jpg");
+            currentCameraDestFile = destFile.getAbsolutePath();
+
+            File parentFile = destFile.getParentFile();
+            if (!parentFile.exists()) {
+                parentFile.mkdirs();
+            }
+
+            Intent _intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            Uri _uri = Uri.fromFile(destFile);
+            _intent.putExtra(MediaStore.EXTRA_OUTPUT, _uri);
+            _intent.putExtra("android.intent.extras.CAMERA_FACING", 1);//前置摄像头
+            startActivityForResult(_intent, IMAGE_SHOOT_RESULT_CODE);
+        } else {
+            // Do not have permissions, request them now
+            EasyPermissions.requestPermissions(this, getString(R.string.camera_rationale),
+                    RC_CAMERA, perms);
+        }
+    }
+
+    private void callbackWebView(final CallBackFunction function, final String result) {
+        ThreadPool.self().addThreadTask(new Runnable() {
+            @Override
+            public void run() {
+                currentActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        function.onCallBack(result);
+                    }
+                });
             }
         });
     }
@@ -188,4 +328,10 @@ public class EngkooActivity extends BaseActivity {
             progressBar.setProgress(newProgress);
         }
     };
+
+    private static String Jpg2String(String filePath) {
+        return android.util.Base64.encodeToString(
+                BitmapHelper.getCompressImage(filePath, 50),
+                Base64.NO_WRAP);
+    }
 }

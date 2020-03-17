@@ -105,8 +105,8 @@ public class LoginDetectFaceActivity extends AppCompatActivity {
 
     private String getFaceImgBase64(Bitmap bitmap, Rect rect) {
 
-        Bitmap newBitmap = BitmapCut.DrawRectangles(bitmap, rect);
-        byte[] bitmapBytes = BitmapCut.readBitmap(newBitmap);
+        Bitmap newBitmap = BitmapHelper.DrawRectangles(bitmap, rect);
+        byte[] bitmapBytes = BitmapHelper.readBitmap(newBitmap);
 
         return android.util.Base64.encodeToString(bitmapBytes, Base64.NO_WRAP);
     }
