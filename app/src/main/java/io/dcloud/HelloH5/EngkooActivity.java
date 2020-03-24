@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ProgressBar;
 
@@ -125,6 +126,13 @@ public class EngkooActivity extends BaseActivity {
     private void initWebView() {
         progressBar = (ProgressBar) findViewById(R.id.progressbar);//进度条
         webView = (BridgeWebView) findViewById(R.id.webview);
+
+        //声明WebSettings子类
+        WebSettings webSettings = webView.getSettings();
+
+        webSettings.setDomStorageEnabled(true); // 开启 DOM storage API 功能
+        webSettings.setDatabaseEnabled(true);   //开启 database storage API 功能
+        webSettings.setAppCacheEnabled(true);//开启 Application Caches 功能
 
         webView.setWebChromeClient(webChromeClient);
         webView.setWebViewClient(new BridgeWebViewClient(webView) {
