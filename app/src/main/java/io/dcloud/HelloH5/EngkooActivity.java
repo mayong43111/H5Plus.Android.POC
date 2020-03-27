@@ -30,13 +30,20 @@ import com.github.lzyzsd.jsbridge.BridgeWebViewClient;
 import com.github.lzyzsd.jsbridge.CallBackFunction;
 import com.sina.weibo.sdk.share.BaseActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.Iterator;
 
 import io.dcloud.common.util.JSUtil;
 import io.dcloud.common.util.ThreadPool;
@@ -64,6 +71,7 @@ public class EngkooActivity extends BaseActivity {
     private String title;
     private String englishAssistantScenarioLessonUrl;
     private String accessToken;
+    private Dictionary nameMapping;
 
     public EngkooActivity() {
         currentActivity = this;
@@ -80,6 +88,7 @@ public class EngkooActivity extends BaseActivity {
             StrictMode.setVmPolicy(builder.build());
         }
 
+        initParameters();
         initStatusBarColor();
         initToolbar();
         initWebView();
@@ -113,13 +122,42 @@ public class EngkooActivity extends BaseActivity {
         }
     }
 
-    private void startEngkooWebView() {
+    private void initParameters() {
+
         Intent intent = getIntent();
         englishAssistantScenarioLessonUrl = intent.getStringExtra("EnglishAssistantScenarioLessonUrl");
         accessToken = intent.getStringExtra("AccessToken");
         title = intent.getStringExtra("Title");
 
-        toolbar.setTitle(title);
+        nameMapping = new Hashtable();
+        String nameMappingString = intent.getStringExtra("NameMapping");
+
+        if (!TextUtils.isEmpty(nameMappingString)) {
+            try {
+                JSONObject reader = new JSONObject(nameMappingString);
+                Iterator iterator = reader.keys();
+
+                while (iterator.hasNext()) {
+                    String key = (String) iterator.next();
+                    nameMapping.put(key, reader.getString(key));
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private String mappingName(String origin) {
+
+        if (nameMapping.get(origin) != null) {
+            return (String) nameMapping.get(origin);
+        }
+
+        return origin;
+    }
+
+    private void startEngkooWebView() {
         webView.loadUrl(englishAssistantScenarioLessonUrl);
     }
 
@@ -149,14 +187,15 @@ public class EngkooActivity extends BaseActivity {
             }
         });
 
-        webView.registerHandler("voiceRequestFromWeb", new BridgeHandler() {
+        webView.registerHandler(mappingName("voiceRequestFromWeb"), new BridgeHandler() {
 
             @Override
             public void handler(String data, final CallBackFunction function) {
 
                 currentFunction = function;
+                String functionName = mappingName(data).toUpperCase();
 
-                switch (data.toUpperCase()) {
+                switch (functionName) {
                     case "LOG_IN":
                         callbackWebView(function, accessToken);
                         break;
@@ -178,8 +217,9 @@ public class EngkooActivity extends BaseActivity {
             public void handler(String data, final CallBackFunction function) {
 
                 currentFunction = function;
+                String functionName = mappingName(data).toUpperCase();
 
-                switch (data.toUpperCase()) {
+                switch (functionName) {
                     case "IMAGE_CHOOSE":
                         imageChoose();
                         break;
@@ -281,6 +321,7 @@ public class EngkooActivity extends BaseActivity {
                 return true;
             }
         });
+        toolbar.setTitle(title);
     }
 
     private void initStatusBarColor() {

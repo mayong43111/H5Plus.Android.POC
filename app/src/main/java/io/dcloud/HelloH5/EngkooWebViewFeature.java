@@ -15,11 +15,13 @@ public class EngkooWebViewFeature extends StandardFeature {
         final String url = array.optString(1);
         final String accessToken = array.optString(2);
         final String title = array.optString(3);
+        final String nameMapping = array.optString(4);
 
         Intent intent = new Intent(webview.getActivity(), EngkooActivity.class);
         intent.putExtra("EnglishAssistantScenarioLessonUrl", url);
         intent.putExtra("AccessToken", accessToken);
         intent.putExtra("Title", title);
+        intent.putExtra("NameMapping", nameMapping);
 
         webview.getActivity().startActivityForResult(intent, 0);
     }
